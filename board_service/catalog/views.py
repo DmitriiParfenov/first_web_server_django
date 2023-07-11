@@ -4,10 +4,16 @@ import os
 
 from django.shortcuts import render
 
+from catalog.models import Category, Product
+
 
 # Create your views here.
 def index(request):
-    return render(request, 'catalog/index.html')
+    ads = Product.objects.all().order_by('-published')[1:6]
+    category = Category.objects.all().order_by('pk')
+    context = {'category': category, 'ads': ads}
+    print(ads)
+    return render(request, 'catalog/index.html', context)
 
 
 def feedback(request):
@@ -25,7 +31,6 @@ def feedback(request):
         values = list(request.POST.values())[1:]
         fb_from_users = dict(zip(keys, values))
         fb_from_users['time'] = date_now_str
-        print(fb_from_users)
         with open('catalog/data_from_users.json', 'a') as file:
             if os.stat('catalog/data_from_users.json').st_size == 0:
                 json.dump([fb_from_users], file)
