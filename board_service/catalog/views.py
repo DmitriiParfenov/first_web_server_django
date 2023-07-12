@@ -4,31 +4,42 @@ import os
 
 from django.shortcuts import render
 
-from catalog.models import Category, Product
+from catalog.models import Category, Product, Feedback
 
 
 # Create your views here.
 def index(request):
-    ads = Product.objects.all().order_by('-published')[1:6]
-    category = Category.objects.all().order_by('pk')
-    context = {'category': category, 'ads': ads}
-    print(ads)
+    """Контроллер возвращает пользователю главную страницу сервиса, где показаны 5 последних объявлений по дате."""
+
+    ads = Product.objects.all().order_by('-published')[0:5]
+    context = {'ads': ads}
     return render(request, 'catalog/index.html', context)
 
 
 def feedback(request):
     """Контроллер обрабатывает запрос от пользователя по префиксу 'feedback/' и возвращает веб-страницу
-    'feedback.html'. Эта страницу является формой обратной связи, если пользователь даст обратную связь, то
-    информация будет выведена в консоль и записана в файл 'data_from_users.json'. """
+    'feedback.html'. Эта страница является формой обратной связи, если пользователь даст обратную связь, то
+    информация будет выведена в консоль, записана в файл 'data_from_users.json' и добавлена на страницу about_as/. """
 
     # Запись даты и времени обращения пользователя
     date_now = datetime.datetime.now()
     date_now_str = datetime.datetime.strftime(date_now, '%Y-%m-%d %H:%M')
 
-    # Запись обратной связи от пользователя в файл и вывод на консоль
     if request.method == 'POST':
         keys = list(request.POST.keys())[1:]
         values = list(request.POST.values())[1:]
+
+        # Создание строки в в модели Feedback
+        fb_from_user = Feedback.objects.create(
+            first_name=values[0],
+            last_name=values[1],
+            email=values[2],
+            phone=values[3],
+            country=values[4],
+            message=values[5]
+        )
+
+        # Запись обратной связи от пользователя в файл
         fb_from_users = dict(zip(keys, values))
         fb_from_users['time'] = date_now_str
         with open('catalog/data_from_users.json', 'a') as file:
@@ -41,3 +52,39 @@ def feedback(request):
                 with open('catalog/data_from_users.json', 'w') as json_file:
                     json.dump(data_from_file, json_file)
     return render(request, 'catalog/feedback.html')
+
+
+def get_products(request):
+    """Контроллер обрабатывает запрос от пользователя по префиксу 'products/' и возвращает веб-страницу
+    'all_products.html'. Эта страница отображает все имеющиеся в базе данных объявления с продуктами, а также
+    ранжирует все продукты по категориям. Добавлен функционал поиска продукта по названию."""
+
+    all_products = Product.objects.all().order_by('-published')
+    categories = Category.objects.all()
+    context = {'products': all_products, 'categories': categories}
+    if request.method == 'POST':
+        word = request.POST.get('keyword')
+        if word:
+            return get_products_by_word(request, word)
+    return render(request, 'catalog/all_products.html', context)
+
+
+def get_products_by_word(request, keyword):
+    """Контроллер обрабатывает запрос от пользователя по префиксу 'products/<int>/' и возвращает веб-страницу
+    'products_by_keyword.html'. Эта страница отображает товар, найденный по ключевому слову."""
+
+    products = Product.objects.filter(name__icontains=keyword)
+    context = {'products': products}
+    return render(request, 'catalog/products_by_keyword.html', context)
+
+
+def post_feedback(request):
+    """Контроллер обрабатывает запрос от пользователя по префиксу 'about/' и возвращает веб-страницу
+    'about_as.html'. Эта страница все отзывы, полученные от пользователей. Автоматически пополняется."""
+
+    feedback_from_user = Feedback.objects.all()
+    context = {'fb': feedback_from_user}
+    return render(request, 'catalog/about_as.html', context)
+
+
+
