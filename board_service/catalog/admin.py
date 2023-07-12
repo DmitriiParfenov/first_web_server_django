@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Product, Category
+from .models import Product, Category, Feedback
 
 
 # Register your models here.
@@ -13,6 +13,14 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 @admin.register(Category)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'title', )
-    list_display_links = ('title', )
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'category', )
+    list_display_links = ('category', )
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'first_name', 'last_name', 'country', 'message', )
+    list_display_links = ('first_name', 'last_name', 'country', 'message', )
+    search_fields = ('first_name', 'message')
+
