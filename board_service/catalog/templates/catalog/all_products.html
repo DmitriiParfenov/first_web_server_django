@@ -1,5 +1,86 @@
 {% extends "layout/basic.html" %}
 
 {% block content %}
-
+<div class="container-fluid mt-2">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title"><a href="{% url 'products' %}">Все объявления</a></h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">
+                                <form class="d-flex" role="search" method="post">
+                                    {% csrf_token %}
+                                    <input class="form-control me-2" type="search" placeholder="Поиск по имени..."
+                                           aria-label="Search" name="keyword">
+                                    <button class="btn btn-outline-success" type="submit">Искать</button>
+                                </form>
+                            </div>
+                            {% for item in products %}
+                            <ul>
+                                <li>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"
+                                            style="font-family: cursive; font-weight: 600; font-size: 100%">
+                                            {{item.name}}
+                                        </li>
+                                        <li class="list-inline-item">{{item.published|date:"d.m.Y H:i:s"}}</li>
+                                    </ul>
+                                    {{item.description}}
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            Цена: {{item.price}} рублей
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <button type="button" class="btn btn-outline-dark"
+                                                    style="font-size: 10px;">
+                                                В корзину
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            {% endfor %}
+                        </div>
+                        <div class="card-footer">
+                            <a href="#" class="btn btn-primary">Добавить товар</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Категории товаров</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for cat in categories %}
+                            <ul>
+                                <li>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            {{cat.category}}
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            {% for prod in cat.categories.all %}
+                                            <li><a class="dropdown-item" href="#">{{prod.name}}</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                            {% endfor %}
+                        </div>
+                        <div class="card-footer">
+                            <a href="#" class="btn btn-primary">Добавить категорию</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
