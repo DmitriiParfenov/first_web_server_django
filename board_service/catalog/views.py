@@ -11,8 +11,11 @@ from catalog.models import Category, Product, Feedback
 def index(request):
     """Контроллер возвращает пользователю главную страницу сервиса, где показаны 5 последних объявлений по дате."""
 
-    ads = Product.objects.all().order_by('-published')[0:5]
-    context = {'ads': ads}
+    object_list = Product.objects.all().order_by('-published')[0:5]
+    context = {
+        'object_list': object_list,
+        'title': 'Catalogue'
+    }
     return render(request, 'catalog/index.html', context)
 
 
@@ -29,7 +32,7 @@ def feedback(request):
         keys = list(request.POST.keys())[1:]
         values = list(request.POST.values())[1:]
 
-        # Создание строки в в модели Feedback
+        # Создание строки в модели Feedback
         fb_from_user = Feedback.objects.create(
             first_name=values[0],
             last_name=values[1],
@@ -51,7 +54,10 @@ def feedback(request):
                     data_from_file.append(fb_from_users)
                 with open('catalog/data_from_users.json', 'w') as json_file:
                     json.dump(data_from_file, json_file)
-    return render(request, 'catalog/feedback.html')
+    context = {
+        'title': 'Catalogue: обратная связь'
+    }
+    return render(request, 'catalog/feedback.html', context)
 
 
 def get_products(request):
@@ -61,7 +67,11 @@ def get_products(request):
 
     all_products = Product.objects.all().order_by('-published')
     categories = Category.objects.all()
-    context = {'products': all_products, 'categories': categories}
+    context = {
+        'products': all_products,
+        'categories': categories,
+        'title': 'Catalogue: все продукты'
+    }
     if request.method == 'POST':
         word = request.POST.get('keyword')
         if word:
@@ -70,11 +80,13 @@ def get_products(request):
 
 
 def get_products_by_word(request, keyword):
-    """Контроллер обрабатывает запрос от пользователя по префиксу 'products/<int>/' и возвращает веб-страницу
+    """Контроллер обрабатывает запрос от пользователя по префиксу 'products/<str>/' и возвращает веб-страницу
     'products_by_keyword.html'. Эта страница отображает товар, найденный по ключевому слову."""
 
-    products = Product.objects.filter(name__icontains=keyword)
-    context = {'products': products}
+    context = {
+        'keyword': keyword,
+        'title': f'Catalogue: продукт {keyword}'
+    }
     return render(request, 'catalog/products_by_keyword.html', context)
 
 
@@ -83,8 +95,18 @@ def post_feedback(request):
     'about_as.html'. Эта страница все отзывы, полученные от пользователей. Автоматически пополняется."""
 
     feedback_from_user = Feedback.objects.all()
-    context = {'fb': feedback_from_user}
+    context = {
+        'fb': feedback_from_user,
+        'title': 'Catalogue: о нас'
+    }
     return render(request, 'catalog/about_as.html', context)
+
+
+def get_product(request):
+    context = {
+        'title': 'Catalogue: о нас'
+    }
+    return render(request, 'catalog/product_card.html', context)
 
 
 
