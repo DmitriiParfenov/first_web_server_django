@@ -1,96 +1,87 @@
 {% extends "layout/basic.html" %}
 
 {% block content %}
-<div class="container-fluid mt-2">
-    <div class="vh-100">
-        <div class="card">
-            <div class="card-header">
-                <h1 class="text-center">Главная</h1>
-                <p class="text-center">Вы находитесь на сайте, предназначенном для продажи товаров.</p>
-            </div>
-            <div class="card-body">
-                <div class="card-group">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Почему мы?</h5>
-                                        <img src="https://csotroitsk.ru/blog/wp-content/uploads/2021/04/e1c391e19fbd550d85bc801213802741.jpg"
-                                             class="card-img-top">
-                                        <p class="card-text">Catalogue service - это российский интернет-сервис
-                                            для размещения объявлений о товарах, недвижимости, а также услугах
-                                            от частных лиц и компаний, занимающий первое место в мире среди сайтов
-                                            объявлений. Товары, предлагаемые к продаже на «Catalogue service», могут
-                                            быть новыми и бывшими в использовании.</p>
-                                    </div>
-                                    <div class="card-footer">
-                                        <a href="#" class="btn btn-primary">Отзывы</a>
-                                    </div>
-                                </div>
-                            </div>
+<div class="card-header">
+    <h1 class="text-center">Главная</h1>
+    <p class="text-center">Вы находитесь на сайте, предназначенном для продажи товаров.</p>
+</div>
+<div class="card-body">
+    <div class="card-group">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Почему мы?</h5>
+                            <img src="https://csotroitsk.ru/blog/wp-content/uploads/2021/04/e1c391e19fbd550d85bc801213802741.jpg"
+                                 class="card-img-top">
+                            <p class="card-text">Catalogue service - это российский интернет-сервис
+                                для размещения объявлений о товарах, недвижимости, а также услугах
+                                от частных лиц и компаний, занимающий первое место в мире среди сайтов
+                                объявлений. Товары, предлагаемые к продаже на «Catalogue service», могут
+                                быть новыми и бывшими в использовании.</p>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="text-center">
-                                        <h4 class="card-title">Последние объявления</h4>
-                                    </div>
-                                    {% for a in ads %}
-                                    <ul>
-                                        <li>
-                                            <ul class="list-inline">
-                                                <li class="list-inline-item"
-                                                    style="font-family: cursive; font-weight: 600; font-size: 100%">
-                                                    {{a.name}}
-                                                </li>
-                                                <li class="list-inline-item">{{a.published|date:"d.m.Y H:i:s"}}</li>
-                                            </ul>
-                                            {{a.description}}
-                                            <ul class="list-inline">
-                                                <li class="list-inline-item">
-                                                    Цена: {{a.price}} рублей
-                                                </li>
-                                                <li class="list-inline-item">
-                                                    <button type="button" class="btn btn-outline-dark"
-                                                            style="font-size: 10px;">
-                                                        В корзину
-                                                    </button>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                    {% endfor %}
-                                </div>
-                                <div class="card-footer">
-                                    <div class="text-center">
-                                        <a href="{% url 'products' %}" class="btn btn-primary">Все товары</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Остались вопросы или есть предложения?</h5>
-                                        <img src="https://www.unicraft.org/wp-content/uploads/2021/02/Asset-30@1000x-8.png"
-                                             class="card-img-top">
-                                        <p class="card-text">Дайте нам обратную связь. Оставьте ваши контактные данные
-                                            с обратной связью о нашей работе по ссылке ниже. Мы берем читаем каждый
-                                            отзыв для улучшения качества работы нашего сервиса.</p>
-                                    </div>
-                                    <div class="card-footer">
-                                        <a href="{% url 'feedback' %}" class="btn btn-primary">Обратная связь</a>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="card-footer">
+                            <a href="#" class="btn btn-primary">Отзывы</a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card-footer">
-                <p>&copy; Все права защищены 2023</p>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <h4 class="card-title">Последние объявления</h4>
+                        </div>
+                        {% for a in object_list %}
+                        <ul>
+                            <li>
+                                <ul class="list-inline">
+                                    <li class="list-inline-item"
+                                        style="font-family: cursive; font-weight: 600; font-size: 100%">
+                                        {{a.name}}
+                                    </li>
+                                    <li class="list-inline-item">{{a.published|date:"d.m.Y H:i:s"}}</li>
+                                </ul>
+                                {{a.description}}
+                                <ul class="list-inline">
+                                    <li class="list-inline-item">
+                                        Цена: {{a.price}} рублей
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <button type="button" class="btn btn-outline-dark"
+                                                style="font-size: 10px;">
+                                            В корзину
+                                        </button>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        {% endfor %}
+                    </div>
+                    <div class="card-footer">
+                        <div class="text-center">
+                            <a href="{% url 'catalog:products' %}" class="btn btn-primary">Все товары</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Остались вопросы или есть предложения?</h5>
+                            <img src="https://www.unicraft.org/wp-content/uploads/2021/02/Asset-30@1000x-8.png"
+                                 class="card-img-top">
+                            <p class="card-text">Дайте нам обратную связь. Оставьте ваши контактные данные
+                                с обратной связью о нашей работе по ссылке ниже. Мы берем читаем каждый
+                                отзыв для улучшения качества работы нашего сервиса.</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'catalog:feedback' %}" class="btn btn-primary">Обратная связь</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

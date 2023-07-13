@@ -1,46 +1,41 @@
 {% extends "layout/basic.html" %}
+{% load products_tags %}
+
 
 {% block content %}
-<div class="container-fluid mt-2">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="container-fluid">
-                <div class="vh-100">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title"><a href="{% url 'products' %}">Все объявления</a></h5>
-                        </div>
-                        <div class="card-body">
-                            {% for item in products %}
-                            <ul>
-                                <li>
-                                    <ul class="list-inline">
-                                        <li class="list-inline-item"
-                                            style="font-family: cursive; font-weight: 600; font-size: 100%">
-                                            {{item.name}}
-                                        </li>
-                                        <li class="list-inline-item">{{item.published|date:"d.m.Y H:i:s"}}</li>
-                                    </ul>
-                                    {{item.description}}
-                                    <ul class="list-inline">
-                                        <li class="list-inline-item">
-                                            Цена: {{item.price}} рублей
-                                        </li>
-                                        <li class="list-inline-item">
-                                            <button type="button" class="btn btn-outline-dark"
-                                                    style="font-size: 10px;">
-                                                В корзину
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="card-body">
+    <div class="card-title">
+        <h5 class="card-title"><a href="{% url 'catalog:products' %}">Все объявления</a></h5>
     </div>
+    {% if keyword|product_by_keyword %}
+    {% for item in keyword|product_by_keyword %}
+    <ul>
+        <li>
+            <ul class="list-inline">
+                <li class="list-inline-item"
+                    style="font-family: cursive; font-weight: 600; font-size: 100%">
+                    {{item.name}}
+                </li>
+                <li class="list-inline-item">{{item.published|date:"d.m.Y H:i:s"}}</li>
+            </ul>
+            {{item.description}}
+            <ul class="list-inline">
+                <li class="list-inline-item">
+                    Цена: {{item.price}} рублей
+                </li>
+                <li class="list-inline-item">
+                    <button type="button" class="btn btn-outline-dark"
+                            style="font-size: 10px;">
+                        В корзину
+                    </button>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    {% endfor %}
+    {% else %}
+    <b>Продукт не найден</b>
+    {% endif %}
 </div>
+
 {% endblock %}
