@@ -11,5 +11,5 @@ urlpatterns = [
     path('products/', get_products, name='products'),
     path('products/<str:keyword>/', get_products_by_word, name='keyword'),
     path('about/', post_feedback, name='about'),
-    path('product/', get_product, name='product')
+    path('products/<int:product_id>', get_product, name='product')
 ]
