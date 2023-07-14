@@ -14,7 +14,7 @@
             <ul class="list-inline">
                 <li class="list-inline-item"
                     style="font-family: cursive; font-weight: 600; font-size: 100%">
-                    {{item.name}}
+                    <a href="{% url 'catalog:product' item.pk %}">{{item.name}}</a>
                 </li>
                 <li class="list-inline-item">{{item.published|date:"d.m.Y H:i:s"}}</li>
             </ul>
