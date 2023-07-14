@@ -3,7 +3,7 @@ import json
 import os
 
 from django.shortcuts import render
-
+from django.core.paginator import Paginator
 from catalog.models import Category, Product, Feedback
 
 
@@ -67,15 +67,22 @@ def get_products(request):
 
     all_products = Product.objects.all().order_by('-published')
     categories = Category.objects.all()
-    context = {
-        'products': all_products,
-        'categories': categories,
-        'title': 'Catalogue: все продукты'
-    }
     if request.method == 'POST':
         word = request.POST.get('keyword')
         if word:
             return get_products_by_word(request, word)
+    paginator = Paginator(all_products, 5)
+    if 'page' in request.GET:
+        page_number = request.GET.get('page')
+    else:
+        page_number = 1
+    page = paginator.get_page(page_number)
+    context = {
+        'products': all_products,
+        'categories': categories,
+        'title': 'Catalogue: все продукты',
+        'page': page,
+    }
     return render(request, 'catalog/all_products.html', context)
 
 
@@ -102,10 +109,16 @@ def post_feedback(request):
     return render(request, 'catalog/about_as.html', context)
 
 
-def get_product(request):
+def get_product(request, product_id):
+    current_product = Product.objects.get(pk=product_id)
     context = {
-        'title': 'Catalogue: о нас'
+        'title': f'Catalogue: {current_product.name}',
+        'current_product': current_product,
     }
+    if request.method == 'POST':
+        word = request.POST.get('keyword')
+        if word:
+            return get_products_by_word(request, word)
     return render(request, 'catalog/product_card.html', context)
 
 
