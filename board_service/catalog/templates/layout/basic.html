@@ -23,19 +23,11 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{% url 'catalog:main' %}">Главная</a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            Категории
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark">
-                            <li><a class="dropdown-item" href="#">Категория 1</a></li>
-                            <li><a class="dropdown-item" href="#">Категория 2</a></li>
-                            <li><a class="dropdown-item" href="#">Категория 3</a></li>
-                        </ul>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'catalog:products' %}">Все товары</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="#">Заказы</a>
-
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="{% url 'catalog:about' %}">О нас</a>
