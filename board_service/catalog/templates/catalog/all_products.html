@@ -1,4 +1,5 @@
 {% extends "layout/basic.html" %}
+{% load products_tags %}
 
 {% block content %}
 <div class="card-body">
@@ -10,12 +11,7 @@
                 </div>
                 <div class="card-body">
                     <div class="card-title">
-                        <form class="d-flex" role="search" method="post">
-                            {% csrf_token %}
-                            <input class="form-control me-2" type="search" placeholder="Поиск по имени..."
-                                   aria-label="Search" name="keyword">
-                            <button class="btn btn-outline-success" type="submit">Искать</button>
-                        </form>
+                        {% include 'catalog/includes/inc_search_field.html' %}
                     </div>
                     {% for item in products %}
                     <ul>
