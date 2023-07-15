@@ -30,11 +30,7 @@
             <div class="card mt-1 mb-5">
                 <div class="row">
                     <div class="col-md-4">
-                        {% if current_product.image|get_image_for_product %}
-                        <img src="{{ current_product.image }}" class="card-img">
-                        {% else %}
-                        <img src="{% static 'sample.png' %}" class="card-img">
-                        {% endif %}
+                        <img src="{{ current_product.image|media_path }}" class="card-img">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
