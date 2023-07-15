@@ -2,9 +2,12 @@ import datetime
 import json
 import os
 
-from django.shortcuts import render
 from django.core.paginator import Paginator
+from django.shortcuts import render
+from django.views.generic.edit import CreateView
+
 from catalog.models import Category, Product, Feedback
+from .forms import ProductForm
 
 
 # Create your views here.
@@ -44,6 +47,7 @@ def feedback(request):
 
         # Запись обратной связи от пользователя в файл
         fb_from_users = dict(zip(keys, values))
+        print(fb_from_users)
         fb_from_users['time'] = date_now_str
         with open('catalog/data_from_users.json', 'a') as file:
             if os.stat('catalog/data_from_users.json').st_size == 0:
@@ -65,17 +69,26 @@ def get_products(request):
     'all_products.html'. Эта страница отображает все имеющиеся в базе данных объявления с продуктами, а также
     ранжирует все продукты по категориям. Добавлен функционал поиска продукта по названию."""
 
+    # Все продукты и категории
     all_products = Product.objects.all().order_by('-published')
     categories = Category.objects.all()
+
+    # Поиск продукта по слову, переданному от пользователя
     if request.method == 'POST':
         word = request.POST.get('keyword')
         if word:
             return get_products_by_word(request, word)
+
+    # Создание пагинатора
     paginator = Paginator(all_products, 5)
+
+    # Выборка страниц
     if 'page' in request.GET:
         page_number = request.GET.get('page')
     else:
         page_number = 1
+
+    # Передача страницы пагинатору
     page = paginator.get_page(page_number)
     context = {
         'products': all_products,
@@ -110,11 +123,15 @@ def post_feedback(request):
 
 
 def get_product(request, product_id):
+    """Контроллер динамически генерирует веб-страницу с информацией о продукте."""
+
     current_product = Product.objects.get(pk=product_id)
     context = {
         'title': f'Catalogue: {current_product.name}',
         'current_product': current_product,
     }
+
+    # Поиск продукта по слову, переданному от пользователя
     if request.method == 'POST':
         word = request.POST.get('keyword')
         if word:
@@ -122,4 +139,14 @@ def get_product(request, product_id):
     return render(request, 'catalog/product_card.html', context)
 
 
+class ProductCreateView(CreateView):
+    """Контроллер создает форму, которая позволяет пользователю добавить товар в базу данных."""
 
+    template_name = 'catalog/create_product.html'
+    form_class = ProductForm
+    success_url = '../products/'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = Category.objects.all()
+        return context
