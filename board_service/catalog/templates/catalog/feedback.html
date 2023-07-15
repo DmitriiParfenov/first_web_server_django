@@ -1,115 +1,108 @@
 {% extends "layout/basic.html" %}
 
 {% block content %}
-<div class="container-fluid mt-5">
-    <div class="card">
-        <div class="card-header">
-            <div class="text-center">
-                <h1>Обратная связь</h1>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <form method="post">
-                                {% csrf_token %}
-                                <div class="mb-3">
-                                    <label for="basic-addon1" class="form-label">Имя</label>
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" placeholder="Введите имя..."
-                                               aria-describedby="basic-addon1" id="basic-addon1" name="username" required>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="basic-addon2" class="form-label">Фамилия</label>
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" placeholder="Введите фамилию..."
-                                               aria-describedby="basic-addon2" id="basic-addon2" name="surname" required>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="basic-addon3" class="form-label">Электронная почта</label>
-                                    <div class="input-group mb-3">
-                                        <input type="email" class="form-control" aria-describedby="basic-addon3"
-                                               id="basic-addon3" name="email" placeholder="Email..." required>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="basic-addon4" class="form-label">Номер телефона</label>
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" aria-describedby="basic-addon4"
-                                               id="basic-addon4" name="number">
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="basic-addon5" class="form-label">Страна</label>
-                                    <div class="input-group mb-3">
-                                        <select class="form-select" aria-label="Default select example"
-                                                id="basic-addon5" name="country" required>
-                                            <option selected>Россия</option>
-                                            <option value="1">Азербайджан</option>
-                                            <option value="2">Армения</option>
-                                            <option value="3">Белоруссия</option>
-                                            <option value="4">Казахстан</option>
-                                            <option value="5">Киргизия</option>
-                                            <option value="6">Молдавия</option>
-                                            <option value="7">Таджикистан</option>
-                                            <option value="7">Узбекистан</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="basic-addon6" class="form-label">Обратная связь</label>
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" aria-describedby="basic-addon6"
-                                               id="basic-addon6" name="message" placeholder="Сообщение..." required>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value=""
-                                               id="invalidCheck3" aria-describedby="invalidCheck3Feedback" required>
-                                        <label class="form-check-label" for="invalidCheck3">
-                                            Я ознакомился с <a href="{% url 'feedback' %}">Политикой о
-                                            Конфидициальности</a>
-                                            и даю согласие на обработку моих персональных данных
-                                        </label>
-                                        <div id="invalidCheck3Feedback" class="invalid-feedback">
-                                            Вы должны принять перед отправкой.
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Отправить</button>
-                            </form>
+<div class="card-header">
+    <div class="text-center">
+        <h1>Обратная связь</h1>
+    </div>
+</div>
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="basic-addon1" class="form-label">Имя</label>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="Введите имя..."
+                                       aria-describedby="basic-addon1" id="basic-addon1" name="username" required>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card" style="height: 39.2rem">
-                        <div class="card-body mt-5">
-                            <ul>
-                                <li><p class="fs-4">Служба поддержки</p>
-                                    <p>8 888 888 88 88 </p>
-                                </li>
-                                <li><p class="fs-4">Главный офис Catalogue service</p>
-                                    <p>8 777 777 77 77 </p>
-                                </li>
-                                <li><p class="fs-4">Сотрудничество</p>
-                                    <p><a href="{% url 'feedback' %}"> example@email.ru </a></p>
-                                </li>
-                                <li><p class="fs-4">Адрес</p>
-                                    <p><a href="{% url 'feedback' %}"> г. Санкт-Петерубург, улица Пример, д5 </a></p>
-                                </li>
-                            </ul>
+                        <div class="mb-3">
+                            <label for="basic-addon2" class="form-label">Фамилия</label>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="Введите фамилию..."
+                                       aria-describedby="basic-addon2" id="basic-addon2" name="surname" required>
+                            </div>
                         </div>
-                    </div>
+                        <div class="mb-3">
+                            <label for="basic-addon3" class="form-label">Электронная почта</label>
+                            <div class="input-group mb-3">
+                                <input type="email" class="form-control" aria-describedby="basic-addon3"
+                                       id="basic-addon3" name="email" placeholder="Email..." required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="basic-addon4" class="form-label">Номер телефона</label>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" aria-describedby="basic-addon4"
+                                       id="basic-addon4" name="number">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="basic-addon5" class="form-label">Страна</label>
+                            <div class="input-group mb-3">
+                                <select class="form-select" aria-label="Default select example"
+                                        id="basic-addon5" name="country" required>
+                                    <option selected>Россия</option>
+                                    <option value="1">Азербайджан</option>
+                                    <option value="2">Армения</option>
+                                    <option value="3">Белоруссия</option>
+                                    <option value="4">Казахстан</option>
+                                    <option value="5">Киргизия</option>
+                                    <option value="6">Молдавия</option>
+                                    <option value="7">Таджикистан</option>
+                                    <option value="7">Узбекистан</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="basic-addon6" class="form-label">Обратная связь</label>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" aria-describedby="basic-addon6"
+                                       id="basic-addon6" name="message" placeholder="Сообщение..." required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value=""
+                                       id="invalidCheck3" aria-describedby="invalidCheck3Feedback" required>
+                                <label class="form-check-label" for="invalidCheck3">
+                                    Я ознакомился с <a href="{% url 'catalog:feedback' %}">Политикой о
+                                    Конфидициальности</a>
+                                    и даю согласие на обработку моих персональных данных
+                                </label>
+                                <div id="invalidCheck3Feedback" class="invalid-feedback">
+                                    Вы должны принять перед отправкой.
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Отправить</button>
+                    </form>
                 </div>
             </div>
         </div>
-        <div class="card-footer">
-            <p>&copy; Все права защищены 2023</p>
+        <div class="col-md-6">
+            <div class="card" style="height: 39.2rem">
+                <div class="card-body mt-5">
+                    <ul>
+                        <li><p class="fs-4">Служба поддержки</p>
+                            <p>8 888 888 88 88 </p>
+                        </li>
+                        <li><p class="fs-4">Главный офис Catalogue service</p>
+                            <p>8 777 777 77 77 </p>
+                        </li>
+                        <li><p class="fs-4">Сотрудничество</p>
+                            <p><a href="{% url 'catalog:feedback' %}"> example@email.ru </a></p>
+                        </li>
+                        <li><p class="fs-4">Адрес</p>
+                            <p><a href="{% url 'catalog:feedback' %}"> г. Санкт-Петерубург, улица Пример, д5 </a></p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>

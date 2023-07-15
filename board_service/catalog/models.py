@@ -25,7 +25,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
-        ordering = ['-published']
+        ordering = ('-published', )
 
 
 class Category(models.Model):
@@ -42,7 +42,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
-        ordering = ['category']
+        ordering = ('category', )
 
 
 class Feedback(models.Model):
@@ -76,4 +76,4 @@ class Feedback(models.Model):
     class Meta:
         verbose_name = 'Обратная связь'
         verbose_name_plural = 'Обратные связи'
-        ordering = ['-publish']
+        ordering = ('-publish', )
