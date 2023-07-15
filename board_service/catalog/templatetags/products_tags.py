@@ -14,7 +14,7 @@ def product_by_keyword(keyword):
 
 
 @register.filter()
-def get_image_for_product(product):
+def media_path(product):
     if product:
-        return f'media/{product}'
-    return False
+        return f'/media/{product}'
+    return '/static/sample.png'
