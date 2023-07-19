@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Product, Category, Feedback
+from .models import Product, Category, Feedback, Blog
 
 
 # Register your models here.
@@ -23,4 +23,12 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_display = ('pk', 'first_name', 'last_name', 'country', 'message', )
     list_display_links = ('first_name', 'last_name', 'country', 'message', )
     search_fields = ('first_name', 'message')
+
+
+@admin.register(Blog)
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'title', 'view_count', 'content', 'published', 'email', 'is_active', )
+    list_display_links = ('title', 'view_count', 'email', )
+    search_fields = ('title', 'view_count')
+
 
