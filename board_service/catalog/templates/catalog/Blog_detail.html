@@ -1,10 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "layout/basic.html" %}
+{% load products_tags %}
+{% load static %}
 
-</body>
-</html>
+{% block content %}
+<div class="card-header">
+    <div class="text-center">
+        <h1>{{ object.title|title }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="container mt-5">
+            <div class="card mt-1 mb-5">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="{{ object.image|media_path }}" class="card-img">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ object.title|title }}</h5>
+                            <p class="card-text">{{ object.content }}</p>
+                            <p class="card-text"><strong>Дата публикации: </strong>{{ object.published }}</p>
+                            <p class="card-text"><strong>Количество просмотров: </strong>{{ object.view_count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'catalog:update_blog' object.pk %}" class="btn btn-primary">
+                        Изменить
+                    </a>
+                    <a href="{% url 'catalog:delete_blog' object.pk %}" class="btn btn-danger float-right">
+                        Удалить
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="container mt-5">
+            <div class="card mt-1 mb-5">
+                <div class="card-body">
+                    <div class="d-grid gap-5 col-6 mx-auto px-auto">
+                        <button class="btn btn-info" type="button">Показать контакты</button>
+                        <button class="btn btn-success" type="button">Сохранить</button>
+                        <a href="{% url 'catalog:feedback' %}" class="btn btn-primary">Обратная связь</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
