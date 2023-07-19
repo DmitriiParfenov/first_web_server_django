@@ -5,7 +5,7 @@
 {% block content %}
 <div class="card-body">
     <div class="card-title">
-        <h5 class="card-title"><a href="{% url 'catalog:products' %}">Все объявления</a></h5>
+        <h5 class="card-title"><a href="{% url 'catalog:product_list' %}">Все объявления</a></h5>
     </div>
     {% if keyword|product_by_keyword %}
     {% for item in keyword|product_by_keyword %}
@@ -14,7 +14,7 @@
             <ul class="list-inline">
                 <li class="list-inline-item"
                     style="font-family: cursive; font-weight: 600; font-size: 100%">
-                    <a href="{% url 'catalog:product' item.pk %}">{{item.name}}</a>
+                    <a href="{% url 'catalog:product_detail' item.pk %}">{{item.name}}</a>
                 </li>
                 <li class="list-inline-item">{{item.published|date:"d.m.Y H:i:s"}}</li>
             </ul>
