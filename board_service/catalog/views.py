@@ -2,24 +2,31 @@ import datetime
 import json
 import os
 
-from django.core.paginator import Paginator
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse_lazy, reverse
+from django.views.generic import TemplateView, ListView, DetailView, UpdateView, DeleteView
 from django.views.generic.edit import CreateView
 
 from catalog.models import Category, Product, Feedback
-from .forms import ProductForm
 
 
-# Create your views here.
-def index(request):
-    """Контроллер возвращает пользователю главную страницу сервиса, где показаны 5 последних объявлений по дате."""
+class IndexTemplateView(TemplateView):
+    """Контроллер генерирует страницу index.html, на которой представлены 5 последних публикаций, остортированных по
+    дате."""
+    template_name = 'catalog/index.html'
 
-    object_list = Product.objects.all().order_by('-published')[0:5]
-    context = {
-        'object_list': object_list,
-        'title': 'Catalogue'
-    }
-    return render(request, 'catalog/index.html', context)
+    def get_context_data(self, **kwargs):
+        """Метод добавляет в context ключ object_list, значение которого — это 5 последних публикаций, остортированных
+        по дате, и ключ title со значением названия текущей вкладки."""
+
+        # Вызов текущего контекста, унаследованного от базового класса
+        context = super().get_context_data(**kwargs)
+
+        # Обновление контекста
+        context['object_list'] = Product.objects.all().order_by('-published')[0:5]
+        context['title'] = 'Catalogue'
+        return context
 
 
 def feedback(request):
@@ -64,89 +71,140 @@ def feedback(request):
     return render(request, 'catalog/feedback.html', context)
 
 
-def get_products(request):
-    """Контроллер обрабатывает запрос от пользователя по префиксу 'products/' и возвращает веб-страницу
-    'all_products.html'. Эта страница отображает все имеющиеся в базе данных объявления с продуктами, а также
-    ранжирует все продукты по категориям. Добавлен функционал поиска продукта по названию."""
+class ProductListView(ListView):
+    """Контроллер генерирует страницу product_list.html, на которой представлены все объявления и все категории.
+    Добавлена пагинация, на каждой странице присутствуют до 5 объявлений. Реализован функционал по поиску товара
+    по имени."""
 
-    # Все продукты и категории
-    all_products = Product.objects.all().order_by('-published')
-    categories = Category.objects.all()
+    # Объявление переменных
+    paginate_by = 5
+    model = Product
+    my_form = 'catalog/products_by_keyword.html'
 
-    # Поиск продукта по слову, переданному от пользователя
-    if request.method == 'POST':
+    def get_context_data(self, *args, **kwargs):
+        """Метод добавляет в context ключ categories, значение которого — это все объекты модели Category, и ключ
+        title со значением названия текущей вкладки."""
+
+        # Вызов текущего контекста, унаследованного от базового класса
+        context = super().get_context_data(*args, **kwargs)
+
+        # Обновление контекста
+        context['categories'] = Category.objects.all()
+        context['title'] = 'Catalogue: все продукты'
+        return context
+
+    def post(self, request):
+        """Метод генерирует шаблон products_by_keyword.html, как результат поиска товара по ключу, полученному от
+         пользователя в POST-запросе."""
+
         word = request.POST.get('keyword')
         if word:
-            return get_products_by_word(request, word)
-
-    # Создание пагинатора
-    paginator = Paginator(all_products, 5)
-
-    # Выборка страниц
-    if 'page' in request.GET:
-        page_number = request.GET.get('page')
-    else:
-        page_number = 1
-
-    # Передача страницы пагинатору
-    page = paginator.get_page(page_number)
-    context = {
-        'products': all_products,
-        'categories': categories,
-        'title': 'Catalogue: все продукты',
-        'page': page,
-    }
-    return render(request, 'catalog/all_products.html', context)
+            return render(request, self.my_form, {'keyword': word})
+        return HttpResponseRedirect(reverse_lazy('catalog:product_list'))
 
 
-def get_products_by_word(request, keyword):
-    """Контроллер обрабатывает запрос от пользователя по префиксу 'products/<str>/' и возвращает веб-страницу
-    'products_by_keyword.html'. Эта страница отображает товар, найденный по ключевому слову."""
+class FeedBackListView(ListView):
+    """Контроллер генерирует страницу feedback_list.html, на которой представлены все отзывы, хранящиеся в
+    модели FeedBack."""
 
-    context = {
-        'keyword': keyword,
-        'title': f'Catalogue: продукт {keyword}'
-    }
-    return render(request, 'catalog/products_by_keyword.html', context)
-
-
-def post_feedback(request):
-    """Контроллер обрабатывает запрос от пользователя по префиксу 'about/' и возвращает веб-страницу
-    'about_as.html'. Эта страница все отзывы, полученные от пользователей. Автоматически пополняется."""
-
-    feedback_from_user = Feedback.objects.all()
-    context = {
-        'fb': feedback_from_user,
+    model = Feedback
+    extra_context = {
         'title': 'Catalogue: о нас'
     }
-    return render(request, 'catalog/about_as.html', context)
 
 
-def get_product(request, product_id):
-    """Контроллер динамически генерирует веб-страницу с информацией о продукте."""
+class ProductDetailView(DetailView):
+    """Контроллер генерирует страницу product_detail.html, на которой представлена информация о конкретном товаре."""
 
-    current_product = Product.objects.get(pk=product_id)
-    context = {
-        'title': f'Catalogue: {current_product.name}',
-        'current_product': current_product,
-    }
+    model = Product
 
-    # Поиск продукта по слову, переданному от пользователя
-    if request.method == 'POST':
-        word = request.POST.get('keyword')
-        if word:
-            return get_products_by_word(request, word)
-    return render(request, 'catalog/product_card.html', context)
+    def get_context_data(self, **kwargs):
+        """Метод добавляет в context ключ title, значение которого — это название рассматриваемого товара."""
+
+        # Вызов текущего контекста, унаследованного от базового класса
+        context = super().get_context_data(**kwargs)
+
+        # Обновление контекста
+        product_name = Product.objects.get(pk=self.kwargs.get('pk'))
+        context['title'] = f'Catalogue: {product_name.name}'
+        return context
 
 
 class ProductCreateView(CreateView):
     """Контроллер создает форму, которая позволяет пользователю добавить товар в базу данных."""
 
-    template_name = 'catalog/create_product.html'
-    form_class = ProductForm
-    success_url = '../products/'
+    # Объявление модели и полей для создание
+    model = Product
+    fields = ('name', 'description', 'image', 'price', 'category')
+    success_url = reverse_lazy('catalog:product_list')
 
+    # Вызов текущего контекста, унаследованного от базового класса
     def get_context_data(self, **kwargs):
+
+        # Вызов текущего контекста, унаследованного от базового класса
         context = super().get_context_data(**kwargs)
+
+        # Обновление контекста
         context['category'] = Category.objects.all()
+        context['title'] = 'Добавление товара'
         return context
+
+
+class ProductUpdateView(UpdateView):
+    """Контроллер на основе шаблона product_form.html позволяет редактировать объявление по модели Product."""
+
+    model = Product
+    fields = ('name', 'description', 'image', 'price', 'category')
+    extra_context = {
+        'title': 'Изменение товара'
+    }
+
+    def get_success_url(self):
+        """Метод возвращает страницу product_detail.html при успешном обновлении объявления."""
+        return reverse('catalog:product_detail', args=[self.object.id])
+
+
+class ProductDeleteView(DeleteView):
+    """Контроллер на основе шаблона product_confirm_delete.html позволяет удалять строки из модели Product.
+    При успешном удалении произойдет переадресация на страницу product_list.html."""
+
+    model = Product
+    success_url = reverse_lazy('catalog:product_list')
+    extra_context = {
+        'title': 'Удаление товара'
+    }
+
+
+class CategoryCreateView(CreateView):
+    """Контроллер создает форму, которая позволяет пользователю добавить категорию в модель Category. При успешном
+    добавлении произойдет переадресация на страницу product_list.html."""
+
+    model = Category
+    fields = ('category', 'description')
+    success_url = reverse_lazy('catalog:product_list')
+    extra_context = {
+        'title': 'Добавление категории'
+    }
+
+
+class CategoryUpdateView(UpdateView):
+    """Контроллер на основе шаблона category_form.html позволяет редактировать категорию по модели Category. При
+    успешном редактировании произойдет переадресация на страницу product_list.html."""
+
+    model = Category
+    fields = ('category', 'description')
+    success_url = reverse_lazy('catalog:product_list')
+    extra_context = {
+        'title': 'Изменение категории'
+    }
+
+
+class CategoryDeleteView(DeleteView):
+    """Контроллер на основе шаблона category_confirm_delete.html позволяет удалять строки из модели Category.
+    При успешном удалении произойдет переадресация на страницу product_list.html."""
+
+    model = Category
+    success_url = reverse_lazy('catalog:product_list')
+    extra_context = {
+        'title': 'Удаление категории'
+    }
