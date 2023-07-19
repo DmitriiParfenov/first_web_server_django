@@ -12,7 +12,7 @@
 <div class="container-fluid">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'catalog:main' %}" style="font-family: fantasy;">Catalogue service</a>
+            <a class="navbar-brand" href="{% url 'catalog:index' %}" style="font-family: fantasy;">Catalogue service</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false"
                     aria-label="Toggle navigation">
@@ -21,16 +21,16 @@
             <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'catalog:main' %}">Главная</a>
+                        <a class="nav-link active" href="{% url 'catalog:index' %}">Главная</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'catalog:products' %}">Все товары</a>
+                        <a class="nav-link active" href="{% url 'catalog:product_list' %}">Все товары</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="#">Заказы</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'catalog:about' %}">О нас</a>
+                        <a class="nav-link active" href="{% url 'catalog:about_list' %}">О нас</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="{% url 'catalog:feedback' %}">Обратная связь</a>
