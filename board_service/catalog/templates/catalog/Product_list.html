@@ -39,23 +39,7 @@
                     </ul>
                     {% endfor %}
 
-                    {% if page_obj.has_other_pages %}
-                    <nav class="list-pages">
-                        <ul class="pagination pagination-lg justify-content-center">
-                            {% for i in page_obj.paginator.page_range %}
-                            {% if page_obj.number == i %}
-                            <li class="page-item active">
-                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                            </li>
-                            {% else %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                            </li>
-                            {% endif %}
-                            {% endfor %}
-                        </ul>
-                    </nav>
-                    {% endif %}
+                    {% include 'catalog/includes/inc_paginate.html' %}
 
                 </div>
                 <div class="card-footer">
