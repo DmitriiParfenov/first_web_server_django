@@ -26,6 +26,11 @@ source venv/bin/activate
 curl -sSL https://install.python-poetry.org | python3
 poetry install
 ```
+# Работа с переменными окружения
+
+- Установите адрес электронный почты [yandex](https://mail.yandex.ru/) в переменную окружения: `yandex_login`.
+- Установите пароль для работы с приложением SMTP [yandex](https://id.yandex.ru/security/app-passwords) в переменную окружения: `yandex_password_smtp`.
+- Установите пароль для работы с базой данных `postgresql` для пользователя `postgres` в переменную окружения: `password`.
 
 # Запуск
 
