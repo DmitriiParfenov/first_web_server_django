@@ -1,0 +1,50 @@
+{% extends "layout/basic.html" %}
+{% load products_tags %}
+
+{% block content %}
+<div class="card-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-10">
+                <div class="text-center">
+                    <h4>Блок: повышаем эффективность продаж</h4>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <a class="btn btn-primary" href="{% url 'catalog:add_blog' %}">Добавить публикацию</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card-body">
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+        {% for object in page_obj %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h5 class="text-center">
+                            <a href="{% url 'catalog:blog_detail' object.pk %}">{{ object.title|title }}</a>
+                            <small>({{ object.slug }})</small>
+                        </h5>
+                    </div>
+                    <img src="{{ object.image|media_path }}" class="card-img">
+                    {% if object.content|length <= 100 %}
+                    <p class="card-text">{{ object.content }} <a href="{% url 'catalog:blog_detail' object.pk %}">Подробнее</a></p>
+                    {% else %}
+                    <p class="card-text">{{ object.content|slice:"0:100" }}...<a href="{% url 'catalog:blog_detail' object.pk %}">
+                        Подробнее</a>
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <p class="text-body-secondary">Опубликовано {{object.published|date:"d.m.Y H:i:s"}}</p>
+                    <span> Просмотры: {{ object.view_count }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+        {% include 'catalog/includes/inc_paginate.html' %}
+</div>
+{% endblock %}

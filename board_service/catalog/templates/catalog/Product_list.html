@@ -7,19 +7,19 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title"><a href="{% url 'catalog:products' %}">Все объявления</a></h5>
+                    <h5 class="card-title"><a href="{% url 'catalog:product_list' %}">Все объявления</a></h5>
                 </div>
                 <div class="card-body">
                     <div class="card-title">
                         {% include 'catalog/includes/inc_search_field.html' %}
                     </div>
-                    {% for obj in page %}
+                    {% for obj in page_obj %}
                     <ul>
                         <li>
                             <ul class="list-inline">
                                 <li class="list-inline-item"
                                     style="font-family: cursive; font-weight: 600; font-size: 100%">
-                                    <a href="{% url 'catalog:product' obj.pk %}">{{obj.name}}</a>
+                                    <a href="{% url 'catalog:product_detail' obj.pk %}">{{obj.name}}</a>
                                 </li>
                                 <li class="list-inline-item">{{obj.published|date:"d.m.Y H:i:s"}}</li>
                             </ul>
@@ -39,23 +39,7 @@
                     </ul>
                     {% endfor %}
 
-                    {% if page.has_other_pages %}
-                    <nav class="list-pages">
-                        <ul class="pagination pagination-lg justify-content-center">
-                            {% for i in page.paginator.page_range %}
-                            {% if page.number == i %}
-                            <li class="page-item active">
-                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                            </li>
-                            {% else %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                            </li>
-                            {% endif %}
-                            {% endfor %}
-                        </ul>
-                    </nav>
-                    {% endif %}
+                    {% include 'catalog/includes/inc_paginate.html' %}
 
                 </div>
                 <div class="card-footer">
@@ -73,15 +57,29 @@
                     <ul>
                         <li>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown"
+                                <button type="button" class="btn btn-secondary dropdown-toggle"
+                                        data-bs-toggle="dropdown"
                                         aria-expanded="false">
-                                    {{cat.category}}
+                                    <span>{{cat.category}}</span>
                                 </button>
+                                <a href="{% url 'catalog:update_category' cat.pk %}"
+                                   class="btn btn-outline-primary">
+                                    Изменить
+                                </a>
+                                <a href="{% url 'catalog:delete_category' cat.pk %}"
+                                   class="btn btn-outline-danger float-right">
+                                    Удалить
+                                </a>
                                 <ul class="dropdown-menu">
+                                    {% if cat.categories.all %}
                                     {% for prod in cat.categories.all %}
-                                    <li><a class="dropdown-item" href="{% url 'catalog:product' prod.pk %}">{{prod.name}}</a>
+                                    <li><a class="dropdown-item"
+                                           href="{% url 'catalog:product_detail' prod.pk %}">{{prod.name}}</a>
                                     </li>
                                     {% endfor %}
+                                    {% else %}
+                                    <li><a class="dropdown-item">Нет товаров</a></li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </li>
@@ -89,7 +87,7 @@
                     {% endfor %}
                 </div>
                 <div class="card-footer">
-                    <a href="#" class="btn btn-primary">Добавить категорию</a>
+                    <a href="{% url 'catalog:add_category' %}" class="btn btn-primary">Добавить категорию</a>
                 </div>
             </div>
         </div>

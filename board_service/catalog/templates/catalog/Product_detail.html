@@ -5,67 +5,59 @@
 {% block content %}
 <div class="card-header">
     <div class="text-center">
-        <h1>{{ current_product.name }}</h1>
-    </div>
-</div>
-<div class="card-title">
-    <div class="container-fluid mt-4">
-        <div class="row">
-            <div class="col-md-12">
-                <ul class="list-inline">
-                    <li class="list-inline-item">
-                        <h5 style="font-family: fantasy;">Catalogue service</h5>
-                    </li>
-                    <li class="list-inline-item">
-                        {% include 'catalog/includes/inc_search_field.html' %}
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <h1>{{ object.name }}</h1>
     </div>
 </div>
 <div class="row">
     <div class="col-md-6">
-        <div class="container">
+        <div class="container mt-5">
             <div class="card mt-1 mb-5">
                 <div class="row">
                     <div class="col-md-4">
-                        <img src="{{ current_product.image|media_path }}" class="card-img">
+                        <img src="{{ object.image|media_path }}" class="card-img">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
                             <ul class="list-inline">
                                 <li class="list-inline-item">
-                                    <h5>{{ current_product.name|title }}</h5>
+                                    <h5>{{ object.name|title }}</h5>
                                 </li>
                                 <li class="list-inline-item">
-                                    <h5>{{ current_product.price }} ₽</h5>
+                                    <h5>{{ object.price }} ₽</h5>
                                 </li>
                             </ul>
-                            <p class="card-text">{{ current_product.description }}</p>
-                            <p><b>Категория:</b> {{ current_product.category }}</p>
+                            <p class="card-text">{{ object.description }}</p>
+                            <p><b>Категория:</b> {{ object.category }}</p>
                             <ul class="list-inline">
                                 <li class="list-inline-item">
                                     <b>Дата публикации:</b>
                                 </li>
                                 <li class="list-inline-item">
-                                    {{current_product.published|date:"d.m.Y H:i:s"}}
+                                    {{object.published|date:"d.m.Y H:i:s"}}
                                 </li>
                                 <li class="list-inline-item">
                                     <b>Дата последнего изменения объявления:</b>
                                 </li>
                                 <li class="list-inline-item">
-                                    {{current_product.changed|date:"d.m.Y H:i:s"}}
+                                    {{object.changed|date:"d.m.Y H:i:s"}}
                                 </li>
                             </ul>
                         </div>
                     </div>
                 </div>
+                <div class="card-footer">
+                    <a href="{% url 'catalog:update_product' object.pk %}" class="btn btn-primary">
+                        Изменить
+                    </a>
+                    <a href="{% url 'catalog:delete_product' object.pk %}" class="btn btn-danger float-right">
+                        Удалить
+                    </a>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-md-6">
-        <div class="container">
+        <div class="container mt-5">
             <div class="card mt-1 mb-5">
                 <div class="card-body">
                     <div class="d-grid gap-5 col-6 mx-auto px-auto">
