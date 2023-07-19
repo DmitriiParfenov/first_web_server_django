@@ -2,13 +2,15 @@ import datetime
 import json
 import os
 
+from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView, DeleteView
 from django.views.generic.edit import CreateView
+from pytils.translit import slugify
 
-from catalog.models import Category, Product, Feedback
+from catalog.models import Category, Product, Feedback, Blog
 
 
 class IndexTemplateView(TemplateView):
@@ -140,7 +142,6 @@ class ProductCreateView(CreateView):
 
     # Вызов текущего контекста, унаследованного от базового класса
     def get_context_data(self, **kwargs):
-
         # Вызов текущего контекста, унаследованного от базового класса
         context = super().get_context_data(**kwargs)
 
@@ -207,4 +208,106 @@ class CategoryDeleteView(DeleteView):
     success_url = reverse_lazy('catalog:product_list')
     extra_context = {
         'title': 'Удаление категории'
+    }
+
+
+class BlogCreateView(CreateView):
+    """Контроллер создает форму, которая позволяет пользователю добавить публикацию на основе модели Blog. При успешном
+    добавлении произойдет переадресация на страницу blog_list.html."""
+
+    model = Blog
+    fields = ('title', 'content', 'image', 'email')
+    success_url = reverse_lazy('catalog:blog_list')
+    extra_context = {
+        'title': 'Создание публикации'
+    }
+
+    def form_valid(self, form):
+        """Метод при успешной генерации формы создает динамически slug для публикации на основе его названия."""
+
+        if form.is_valid():
+            new_mat = form.save()
+            new_mat.slug = slugify(new_mat.title)
+            new_mat.save()
+
+        return super().form_valid(form)
+
+
+class BlogListView(ListView):
+    """Контроллер генерирует страницу blog_list.html, на которой представлены все публикации, хранящиеся в
+    модели Blog. В странице есть пагинация, которая отображает до 3 публикаций на одной странице."""
+
+    paginate_by = 3
+    model = Blog
+    extra_context = {
+        'title': 'Блок'
+    }
+
+    def get_queryset(self):
+        """Метод возвращает только те публикации, для которых поле is_active есть True."""
+
+        queryset = super().get_queryset()
+        queryset = queryset.filter(is_active=True)
+        return queryset
+
+
+class BlogDetailView(DetailView):
+    """Контроллер генерирует страницу blog_detail.html, на которой представлена информация о конкретной публикации."""
+
+    model = Blog
+
+    def get_object(self, queryset=None):
+        """Метод инкрементирует поле view_count на 1 для конкретной публикации при обращениий к ней. Если view_count
+        равняется 100, то пользователь получит письмо на указанный электронный адрес с поздравлением."""
+
+        # Обращение к текущему объекту модели Blog
+        self.object = super().get_object(queryset)
+        self.object.view_count += 1
+        self.object.save()
+
+        # Создание заголовка и тела сообщения для отправки на электронный адрес
+        message = f'Поздравляем!\nВаша публикация "{self.object.title}" на сайте Catalogue набрала ' \
+                  f'{self.object.view_count} просмотров!\n\n С уважением, Администрация сайта!'
+        subject = 'Поздравление от сайта Catalogue'
+
+        # Объявление получателя сообщения
+        recipient = self.object.email
+
+        # Отправка сообщения пользователю, если количество просмотров равно 100
+        if self.object.view_count == 100:
+            send_mail(subject, message, os.getenv('yandex_login'), (recipient,))
+        return self.object
+
+    def get_context_data(self, **kwargs):
+        """Метод добавляет в контекст ключ title со значением — название текущей публикации."""
+
+        context = super().get_context_data(**kwargs)
+        blog_title = Blog.objects.get(pk=self.kwargs.get('pk'))
+        context['title'] = blog_title.title
+        return context
+
+
+class BlogUpdateView(UpdateView):
+    """Контроллер на основе шаблона идщп_form.html позволяет редактировать публикацию по модели Blog."""
+
+    model = Blog
+    fields = ('title', 'content', 'image', 'email')
+    success_url = reverse_lazy('catalog:blog_list')
+    extra_context = {
+        'title': 'Изменение блога'
+    }
+
+    def get_success_url(self):
+        """Метод возвращает страницу blog_detail.html при успешном обновлении публикации."""
+        return reverse('catalog:blog_detail', args=[self.object.id])
+
+
+class BlogDeleteView(DeleteView):
+    """Контроллер на основе шаблона blog_confirm_delete.html позволяет удалять строки из модели Blog.
+    При успешном удалении произойдет переадресация на страницу blog_list.html."""
+
+    model = Blog
+    success_url = reverse_lazy('catalog:blog_list')
+    extra_context = {
+        'title': 'Удаление публикации'
     }
