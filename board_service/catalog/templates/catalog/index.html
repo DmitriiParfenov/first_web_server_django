@@ -22,7 +22,7 @@
                                 быть новыми и бывшими в использовании.</p>
                         </div>
                         <div class="card-footer">
-                            <a href="{% url 'catalog:about' %}" class="btn btn-primary">Отзывы</a>
+                            <a href="{% url 'catalog:about_list' %}" class="btn btn-primary">Отзывы</a>
                         </div>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                                 <ul class="list-inline">
                                     <li class="list-inline-item"
                                         style="font-family: cursive; font-weight: 600; font-size: 100%">
-                                        <a href="{% url 'catalog:product' a.pk %}">{{a.name}}</a>
+                                        <a href="{% url 'catalog:product_detail' a.pk %}">{{a.name}}</a>
                                     </li>
                                     <li class="list-inline-item">{{a.published|date:"d.m.Y H:i:s"}}</li>
                                 </ul>
@@ -65,7 +65,7 @@
                     </div>
                     <div class="card-footer">
                         <div class="text-center">
-                            <a href="{% url 'catalog:products' %}" class="btn btn-primary">Все товары</a>
+                            <a href="{% url 'catalog:product_list' %}" class="btn btn-primary">Все товары</a>
                         </div>
                     </div>
                 </div>
