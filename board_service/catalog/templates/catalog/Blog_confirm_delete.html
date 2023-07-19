@@ -1,10 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'layout/basic.html' %}
 
-</body>
-</html>
+{% block content %}
+
+<div class="card-body">
+    <form method="post">
+        {% csrf_token %}
+        <div class="card-title">
+            <h5 class="card-title">Удаление публикации {{ object.title|title }}</h5>
+        </div>
+        <p>Действительно хотите удалить категорию "{{ object.title|title }}" ?</p>
+        <button type="submit" class="btn btn-danger">
+            Удалить
+        </button>
+        <a href="{% url 'catalog:blog_list'%}" class="btn btn-warning">Отмена</a>
+    </form>
+</div>
+
+{% endblock %}
