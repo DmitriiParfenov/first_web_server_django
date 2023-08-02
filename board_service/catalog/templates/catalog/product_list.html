@@ -35,6 +35,21 @@
                                     </button>
                                 </li>
                             </ul>
+                            <ul class="list-inline">
+                            {% for version in versions %}
+                                {% if version.product.pk == obj.pk %}
+                                <li class="list-inline-item">
+                                    <strong>Название: </strong>{{ version.title|lower }},
+                                </li>
+                                <li class="list-inline-item">
+                                    <strong>номер: </strong>{{ version.number }},
+                                </li>
+                                <li class="list-inline-item">
+                                    <strong>статус: </strong> активно.
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
                         </li>
                     </ul>
                     {% endfor %}

@@ -1,0 +1,62 @@
+{% extends 'layout/basic.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mt-5 mb-5">
+                    <div class="card-header">
+                        {% if object %}
+                        <h4>Изменение объявления </h4>
+                        {% else %}
+                        <h4>Добавление объявления </h4>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        {{ form.as_p }}
+                        {% if object %}
+                        <input type="submit" value="Изменить" class="btn btn-primary">
+                        {% else %}
+                        <input type="submit" value="Добавить" class="btn btn-primary">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                {% if object %}
+                <div class="card mt-5 mb-5">
+                    <div class="card-header">
+                        <h4>Версионность</h4>
+                    </div>
+                    <div class="card-body">
+                        {{ formset.management_form }}
+                        {% for form in formset.forms %}
+                        {{ form.as_p }}
+                        {% if not forloop.last %}
+                            <hr>
+                        {% endif %}
+                        {% endfor %}
+
+
+                        {% if formset.non_form_errors %}
+                        <div class="text-center">
+                            <div class="p-3 text-primary-emphasis bg-danger border border-danger rounded-3">
+                                {% for error in formset.non_form_errors %}
+                                <h6>{{ error }}</h6>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                {% include 'catalog/includes/inc_addition_rules.html' %}
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
