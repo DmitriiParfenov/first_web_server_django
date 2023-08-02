@@ -3,6 +3,8 @@ import json
 import os
 
 from django.core.mail import send_mail
+from django.db import transaction
+from django.forms import inlineformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
@@ -10,7 +12,8 @@ from django.views.generic import TemplateView, ListView, DetailView, UpdateView,
 from django.views.generic.edit import CreateView
 from pytils.translit import slugify
 
-from catalog.models import Category, Product, Feedback, Blog
+from catalog.forms import ProductForm, CategoryForm, BlogForm, VersionForm, VersionBaseInlineFormSet
+from catalog.models import Category, Product, Feedback, Blog, Version
 
 
 class IndexTemplateView(TemplateView):
@@ -93,6 +96,7 @@ class ProductListView(ListView):
         # Обновление контекста
         context['categories'] = Category.objects.all()
         context['title'] = 'Catalogue: все продукты'
+        context['versions'] = Version.objects.filter(is_active=True)
         return context
 
     def post(self, request):
@@ -137,7 +141,7 @@ class ProductCreateView(CreateView):
 
     # Объявление модели и полей для создание
     model = Product
-    fields = ('name', 'description', 'image', 'price', 'category')
+    form_class = ProductForm
     success_url = reverse_lazy('catalog:product_list')
 
     # Вызов текущего контекста, унаследованного от базового класса
@@ -155,10 +159,46 @@ class ProductUpdateView(UpdateView):
     """Контроллер на основе шаблона product_form.html позволяет редактировать объявление по модели Product."""
 
     model = Product
-    fields = ('name', 'description', 'image', 'price', 'category')
+    form_class = ProductForm
     extra_context = {
         'title': 'Изменение товара'
     }
+    my_form = 'catalog/product_detail.html'
+
+    def get_context_data(self, **kwargs):
+        # Вызов текущего контекста, унаследованного от базового класса
+        context = super().get_context_data(**kwargs)
+
+        # Обновление контекста
+        context['category'] = Category.objects.all()
+        context['title'] = 'Добавление товара'
+
+        # Объявление вложенной формы
+        VersionFormset = inlineformset_factory(Product, Version, form=VersionForm, extra=1,
+                                               formset=VersionBaseInlineFormSet)
+
+        # Добавление вложенный формы в контекст
+        if self.request.method == 'POST':
+            formset = VersionFormset(self.request.POST, instance=self.object)
+        else:
+            formset = VersionFormset(instance=self.object)
+
+        context['formset'] = formset
+        return context
+
+    def form_valid(self, form):
+        context_data = self.get_context_data()
+        formset = context_data['formset']
+        with transaction.atomic():
+            if form.is_valid():
+                self.object = form.save()
+                if formset.is_valid():
+                    formset.instance = self.object
+                    formset.save()
+                else:
+                    return super().form_invalid(form)
+
+        return super().form_valid(form)
 
     def get_success_url(self):
         """Метод возвращает страницу product_detail.html при успешном обновлении объявления."""
@@ -181,7 +221,7 @@ class CategoryCreateView(CreateView):
     добавлении произойдет переадресация на страницу product_list.html."""
 
     model = Category
-    fields = ('category', 'description')
+    form_class = CategoryForm
     success_url = reverse_lazy('catalog:product_list')
     extra_context = {
         'title': 'Добавление категории'
@@ -193,7 +233,7 @@ class CategoryUpdateView(UpdateView):
     успешном редактировании произойдет переадресация на страницу product_list.html."""
 
     model = Category
-    fields = ('category', 'description')
+    form_class = CategoryForm
     success_url = reverse_lazy('catalog:product_list')
     extra_context = {
         'title': 'Изменение категории'
@@ -216,7 +256,7 @@ class BlogCreateView(CreateView):
     добавлении произойдет переадресация на страницу blog_list.html."""
 
     model = Blog
-    fields = ('title', 'content', 'image', 'email')
+    form_class = BlogForm
     success_url = reverse_lazy('catalog:blog_list')
     extra_context = {
         'title': 'Создание публикации'
@@ -291,7 +331,7 @@ class BlogUpdateView(UpdateView):
     """Контроллер на основе шаблона идщп_form.html позволяет редактировать публикацию по модели Blog."""
 
     model = Blog
-    fields = ('title', 'content', 'image', 'email')
+    form_class = BlogForm
     success_url = reverse_lazy('catalog:blog_list')
     extra_context = {
         'title': 'Изменение блога'
