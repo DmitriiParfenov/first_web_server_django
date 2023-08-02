@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 
 NULLABLE = {'blank': True, 'null': True}
@@ -17,7 +19,8 @@ class Product(models.Model):
     published = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата добавления')
     changed = models.DateTimeField(auto_now=True, db_index=True, verbose_name='Изменения')
     price = models.FloatField(verbose_name='Цена')
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='categories')
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='categories',
+                                 verbose_name='Категория', )
 
     def __str__(self):
         return f'{self.name} ({self.category})'
@@ -25,7 +28,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
-        ordering = ('-published', )
+        ordering = ('-published',)
 
 
 class Category(models.Model):
@@ -42,7 +45,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
-        ordering = ('category', )
+        ordering = ('category',)
 
 
 class Feedback(models.Model):
@@ -76,7 +79,7 @@ class Feedback(models.Model):
     class Meta:
         verbose_name = 'Обратная связь'
         verbose_name_plural = 'Обратные связи'
-        ordering = ('-publish', )
+        ordering = ('-publish',)
 
 
 class Blog(models.Model):
@@ -95,4 +98,31 @@ class Blog(models.Model):
     class Meta:
         verbose_name = 'Блог'
         verbose_name_plural = 'Блоги'
-        ordering = ('-published', )
+        ordering = ('-published',)
+
+
+def increment_version_number():
+    max_number = Version.objects.all().order_by('number').last()
+    if not max_number:
+        return 1.00
+    return max_number.number + Decimal('0.1')
+
+
+class Version(models.Model):
+    class VersionName(models.TextChoices):
+        NAME_DEVELOP = 'В разработке', 'В разработке'
+        NAME_RELEASE = 'Выпуск в производстве', 'Выпуск в производстве'
+
+    title = models.CharField(choices=VersionName.choices, default=VersionName.NAME_DEVELOP, verbose_name='Название')
+    number = models.DecimalField(max_digits=3, decimal_places=2, verbose_name='Номер версии',
+                                 default=increment_version_number, unique=True)
+    is_active = models.BooleanField(default=False, verbose_name='Активность')
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='versions', verbose_name='Продукт')
+
+    def __str__(self):
+        return f'{self.title}'
+
+    class Meta:
+        verbose_name = 'Версия'
+        verbose_name_plural = 'Версии'
+        ordering = ('-number',)
