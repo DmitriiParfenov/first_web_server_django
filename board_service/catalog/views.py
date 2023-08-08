@@ -14,6 +14,7 @@ from pytils.translit import slugify
 
 from catalog.forms import ProductForm, CategoryForm, BlogForm, VersionForm, VersionBaseInlineFormSet
 from catalog.models import Category, Product, Feedback, Blog, Version
+from users.models import User
 
 
 class IndexTemplateView(TemplateView):
@@ -31,6 +32,7 @@ class IndexTemplateView(TemplateView):
         # Обновление контекста
         context['object_list'] = Product.objects.all().order_by('-published')[0:5]
         context['title'] = 'Catalogue'
+
         return context
 
 
@@ -97,6 +99,7 @@ class ProductListView(ListView):
         context['categories'] = Category.objects.all()
         context['title'] = 'Catalogue: все продукты'
         context['versions'] = Version.objects.filter(is_active=True)
+
         return context
 
     def post(self, request):
@@ -106,6 +109,7 @@ class ProductListView(ListView):
         word = request.POST.get('keyword')
         if word:
             return render(request, self.my_form, {'keyword': word})
+
         return HttpResponseRedirect(reverse_lazy('catalog:product_list'))
 
 
@@ -133,26 +137,52 @@ class ProductDetailView(DetailView):
         # Обновление контекста
         product_name = Product.objects.get(pk=self.kwargs.get('pk'))
         context['title'] = f'Catalogue: {product_name.name}'
+
         return context
 
 
 class ProductCreateView(CreateView):
     """Контроллер создает форму, которая позволяет пользователю добавить товар в базу данных."""
 
-    # Объявление модели и полей для создание
+    # Объявление модели и формы для создания
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:product_list')
 
-    # Вызов текущего контекста, унаследованного от базового класса
     def get_context_data(self, **kwargs):
+        """Метод добавляет в контекст шаблонные переменные category со всеми объектами из модели Category и title с
+        названием текущей вкладки."""
+
         # Вызов текущего контекста, унаследованного от базового класса
         context = super().get_context_data(**kwargs)
 
         # Обновление контекста
         context['category'] = Category.objects.all()
         context['title'] = 'Добавление товара'
+
         return context
+
+    def form_valid(self, form):
+        """Метод возвращает только валидную форму. Объекты в модели Product могут создать только авторизованные
+        пользатели, причем эти пользователи автоматически присваиваются к создаваемому объекту."""
+
+        if form.is_valid():
+
+            # Получение текущего авторизованного пользователя
+            current_user = self.request.user
+
+            # Если пользователь есть в базе данных Users, то произойдет создание объекта в бд, иначе — вернется форма
+            # с оповещением того, что необходима авторизация. В шаблоне к текущему контроллеру кнопка "Добавить объект"
+            # скрыта и доступна только авторизованным пользователям.
+            if User.objects.filter(email=f'{current_user}').exists():
+                self.object = form.save()
+                self.object.user_product = self.request.user
+                self.object.save()
+            else:
+                self.object = form.save(commit=False)
+                return render(self.request, 'catalog/require_authentication.html')
+
+        return super().form_valid(form)
 
 
 class ProductUpdateView(UpdateView):
@@ -166,12 +196,16 @@ class ProductUpdateView(UpdateView):
     my_form = 'catalog/product_detail.html'
 
     def get_context_data(self, **kwargs):
+        """Метод добавляет в контекст шаблонные переменные category со всеми объектами из модели Category, title с
+        названием текущей вкладки и product_user с привязанным к текущему продукту пользователем."""
+
         # Вызов текущего контекста, унаследованного от базового класса
         context = super().get_context_data(**kwargs)
 
         # Обновление контекста
         context['category'] = Category.objects.all()
         context['title'] = 'Добавление товара'
+        context['product_user'] = self.object.user_product
 
         # Объявление вложенной формы
         VersionFormset = inlineformset_factory(Product, Version, form=VersionForm, extra=1,
@@ -187,16 +221,36 @@ class ProductUpdateView(UpdateView):
         return context
 
     def form_valid(self, form):
+        """Метод возвращает только валидную форму. Объекты в модели Product могут изменять только авторизованные
+        пользатели, к тому же пользователи не могут изменять публикации, создателями которых они не являются."""
+
+        # Получение привязанного пользователя к текущей публикации и вложенных форм
         context_data = self.get_context_data()
+        product_user = context_data['product_user']
         formset = context_data['formset']
+
         with transaction.atomic():
             if form.is_valid():
-                self.object = form.save()
-                if formset.is_valid():
-                    formset.instance = self.object
-                    formset.save()
+                current_user = self.request.user
+
+                # Если пользователь есть в базе данных Users и он является создателем текущей публикации, то произойдет
+                # создание объекта в бд, иначе — вернется форма с оповещением о невозможности изменения чужой
+                # публикации. В шаблоне к текущему контроллеру кнопка "Изменить объект" скрыта и доступна только
+                # авторизованным пользователям или собственникам публикации.
+                if User.objects.filter(email=f'{current_user}').exists() and current_user == product_user:
+                    self.object = form.save()
+                    self.object.user_product = self.request.user
+                    self.object.save()
+                    if formset.is_valid():
+                        self.object.user_product = self.request.user
+                        self.object.save()
+                        formset.instance = self.object
+                        formset.save()
+                    else:
+                        return super().form_invalid(form)
                 else:
-                    return super().form_invalid(form)
+                    self.object = form.save(commit=False)
+                    return render(self.request, 'catalog/require_authentication.html')
 
         return super().form_valid(form)
 
@@ -227,6 +281,25 @@ class CategoryCreateView(CreateView):
         'title': 'Добавление категории'
     }
 
+    def form_valid(self, form):
+        """Метод возвращает только валидную форму. Объекты в модели Category могут создать только авторизованные
+        пользатели, причем эти пользователи автоматически присваиваются к создаваемому объекту."""
+
+        # Если пользователь есть в базе данных Users, то произойдет создание объекта в бд, иначе — вернется форма
+        # с оповещением того, что необходима авторизация. В шаблоне к текущему контроллеру кнопка "Добавить объект"
+        # скрыта и доступна только авторизованным пользователям.
+        if form.is_valid():
+            current_user = self.request.user
+            if User.objects.filter(email=f'{current_user}').exists():
+                self.object = form.save()
+                self.object.user_category = self.request.user
+                self.object.save()
+            else:
+                self.object = form.save(commit=False)
+                return render(self.request, 'catalog/require_authentication.html')
+
+        return super().form_valid(form)
+
 
 class CategoryUpdateView(UpdateView):
     """Контроллер на основе шаблона category_form.html позволяет редактировать категорию по модели Category. При
@@ -238,6 +311,40 @@ class CategoryUpdateView(UpdateView):
     extra_context = {
         'title': 'Изменение категории'
     }
+
+    def get_context_data(self, **kwargs):
+        """Метод добавляет в контекст шаблонную переменную category_user с привязанным к текущей категории
+        пользователем."""
+
+        context = super().get_context_data(**kwargs)
+        context['category_user'] = self.object.user_category
+
+        return context
+
+    def form_valid(self, form):
+        """Метод возвращает только валидную форму. Объекты в модели Category могут изменять только авторизованные
+        пользатели, к тому же пользователи не могут изменять публикации, создателями которых они не являются."""
+
+        # Получение привязанного пользователя к текущей публикации
+        context_data = self.get_context_data()
+        category_user = context_data['category_user']
+
+        if form.is_valid():
+            current_user = self.request.user
+
+            # Если пользователь есть в базе данных Users и он является создателем текущей категории, то произойдет
+            # создание объекта в бд, иначе — вернется форма с оповещением о невозможности изменения чужой
+            # категории. В шаблоне к текущему контроллеру кнопка "Изменить объект" скрыта и доступна только
+            # авторизованным пользователям или собственникам категории.
+            if User.objects.filter(email=f'{current_user}').exists() and current_user == category_user:
+                self.object = form.save()
+                self.object.user_category = self.request.user
+                self.object.save()
+            else:
+                self.object = form.save(commit=False)
+                return render(self.request, 'catalog/require_authentication.html')
+
+        return super().form_valid(form)
 
 
 class CategoryDeleteView(DeleteView):
@@ -269,6 +376,18 @@ class BlogCreateView(CreateView):
             new_mat = form.save()
             new_mat.slug = slugify(new_mat.title)
             new_mat.save()
+            current_user = self.request.user
+
+            # Если пользователь есть в базе данных Users, то произойдет создание объекта в бд, иначе — вернется форма
+            # с оповещением того, что необходима авторизация. В шаблоне к текущему контроллеру кнопка "Добавить объект"
+            # скрыта и доступна только авторизованным пользователям.
+            if User.objects.filter(email=f'{current_user}').exists():
+                self.object = form.save()
+                self.object.user_blog = self.request.user
+                self.object.save()
+            else:
+                self.object = form.save(commit=False)
+                return render(self.request, 'catalog/require_authentication.html')
 
         return super().form_valid(form)
 
@@ -340,6 +459,37 @@ class BlogUpdateView(UpdateView):
     def get_success_url(self):
         """Метод возвращает страницу blog_detail.html при успешном обновлении публикации."""
         return reverse('catalog:blog_detail', args=[self.object.id])
+
+    def get_context_data(self, **kwargs):
+        """Метод добавляет в контекст шаблонную переменную user_blog с привязанным к текущей публикации
+        пользователем."""
+        context = super().get_context_data(**kwargs)
+        context['user_blog'] = self.object.user_blog
+        return context
+
+    def form_valid(self, form):
+        """Метод возвращает только валидную форму. Объекты в модели Blog могут изменять только авторизованные
+        пользатели, к тому же пользователи не могут изменять публикации, создателями которых они не являются."""
+
+        # Получение текущего авторизованного пользователя
+        context_data = self.get_context_data()
+        user_blog = context_data['user_blog']
+
+        # Если пользователь есть в базе данных Users и он является создателем текущей публикации, то произойдет
+        # создание объекта в бд, иначе — вернется форма с оповещением о невозможности изменения чужой
+        # публикации. В шаблоне к текущему контроллеру кнопка "Изменить объект" скрыта и доступна только
+        # авторизованным пользователям или собственникам публикации.
+        if form.is_valid():
+            current_user = self.request.user
+            if User.objects.filter(email=f'{current_user}').exists() and current_user == user_blog:
+                self.object = form.save()
+                self.object.user_blog = self.request.user
+                self.object.save()
+            else:
+                self.object = form.save(commit=False)
+                return render(self.request, 'catalog/require_authentication.html')
+
+        return super().form_valid(form)
 
 
 class BlogDeleteView(DeleteView):
