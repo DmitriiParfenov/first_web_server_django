@@ -1,0 +1,33 @@
+{% extends 'layout/basic.html' %}
+
+{% block content %}
+<div class="container-fluid" xmlns="http://www.w3.org/1999/html">
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <div class="card mt-5 mb-5">
+                <div class="card-header">
+                    {% if user.is_authenticated %}
+                    <h4>Предупреждение</h4>
+                    {% else %}
+                    <h4>Необходима аутентификация пользователя</h4>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if user.is_authenticated %}
+                    <p>Нельзя изменять публикации других пользователей</p>
+                    {% else %}
+                    <p>
+                      Для размещения / редактирования / удаления любых записей на нашем сайте, необходима авторизация
+                      пользователя. Пожалуйста, выполните вход или зарегистрируйтесь.
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'catalog:index' %}" class="btn btn-primary">На главную страницу</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

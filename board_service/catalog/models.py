@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 
 NULLABLE = {'blank': True, 'null': True}
@@ -21,6 +22,8 @@ class Product(models.Model):
     price = models.FloatField(verbose_name='Цена')
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='categories',
                                  verbose_name='Категория', )
+    user_product = models.ForeignKey('users.User', on_delete=models.SET_NULL, verbose_name='пользователь',
+                                     **NULLABLE)
 
     def __str__(self):
         return f'{self.name} ({self.category})'
@@ -38,6 +41,8 @@ class Category(models.Model):
     """
     category = models.CharField(max_length=50, verbose_name='Категория')
     description = models.TextField(verbose_name='Описание')
+    user_category = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE,
+                                      verbose_name='пользователь')
 
     def __str__(self):
         return f'{self.category}'
@@ -91,6 +96,8 @@ class Blog(models.Model):
     published = models.DateTimeField(db_index=True, auto_now_add=True, verbose_name='Дата создания')
     is_active = models.BooleanField(default=True, verbose_name='Разрешение на публикацию')
     email = models.EmailField(max_length=100, verbose_name='Электронная почта')
+    user_blog = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE,
+                                  verbose_name='пользователь')
 
     def __str__(self):
         return f'{self.title}. Просмотров ({self.view_count})'

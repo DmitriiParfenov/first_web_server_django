@@ -28,13 +28,20 @@
                                 <li class="list-inline-item">
                                     Цена: {{obj.price}} рублей
                                 </li>
+                                {% if user.is_authenticated %}
+                                {% if user != obj.user_product %}
                                 <li class="list-inline-item">
                                     <button type="button" class="btn btn-outline-dark"
                                             style="font-size: 10px;">
                                         В корзину
                                     </button>
                                 </li>
+                                {% else %}
+                                {% endif %}
+                                {% else %}
+                                {% endif %}
                             </ul>
+                            <strong>Пользователь: </strong>{{ obj.user_product|default:"нет" }}
                             <ul class="list-inline">
                             {% for version in versions %}
                                 {% if version.product.pk == obj.pk %}
@@ -57,9 +64,12 @@
                     {% include 'catalog/includes/inc_paginate.html' %}
 
                 </div>
+                {% if user.is_authenticated %}
                 <div class="card-footer">
-                    <a href="{% url 'catalog:add_product' %}" class="btn btn-primary">Добавить товар</a>
+                        <a href="{% url 'catalog:add_product' %}" class="btn btn-primary">Добавить товар</a>
                 </div>
+                {% else %}
+                {% endif %}
             </div>
         </div>
         <div class="col-md-6">
@@ -77,6 +87,8 @@
                                         aria-expanded="false">
                                     <span>{{cat.category}}</span>
                                 </button>
+                                {% if user.is_authenticated %}
+                                {% if user == cat.user_category %}
                                 <a href="{% url 'catalog:update_category' cat.pk %}"
                                    class="btn btn-outline-primary">
                                     Изменить
@@ -85,6 +97,10 @@
                                    class="btn btn-outline-danger float-right">
                                     Удалить
                                 </a>
+                                {% else %}
+                                {% endif %}
+                                {% else %}
+                                {% endif %}
                                 <ul class="dropdown-menu">
                                     {% if cat.categories.all %}
                                     {% for prod in cat.categories.all %}
@@ -101,9 +117,12 @@
                     </ul>
                     {% endfor %}
                 </div>
+                {% if user.is_authenticated %}
                 <div class="card-footer">
                     <a href="{% url 'catalog:add_category' %}" class="btn btn-primary">Добавить категорию</a>
                 </div>
+                {% else %}
+                {% endif %}
             </div>
         </div>
     </div>

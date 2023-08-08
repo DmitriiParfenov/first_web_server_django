@@ -1,0 +1,59 @@
+{% extends 'layout/basic.html' %}
+{% load products_tags %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mt-5 mb-5">
+                <div class="card-header">
+                    <h4>Изменение информации о пользователе</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary">Изменить</button>
+                        <a href="{% url 'users:password_change' %}" class="btn btn-danger"> Изменить пароль</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card mt-5 mb-5">
+                <div class="card-header">
+                    <h4 class="text-center">Текущая информация о пользователе</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <img src="{{ user.avatar|media_path }}" class="img-fluid">
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <ul>
+                                <li>
+                                    <strong>Электронная почта: </strong>{{ user.email }}
+                                </li>
+                                <li>
+                                    <strong>Имя: </strong>{{ user.first_name }}
+                                </li>
+                                <li>
+                                    <strong>Фамилие: </strong>{{ user.last_name }}
+                                </li>
+                                <li>
+                                    <strong>Номер телефона: </strong>{{ user.phone }}
+                                </li>
+                                <li>
+                                    <strong>Страна проживания: </strong>{{ user.country }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

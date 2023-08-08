@@ -20,11 +20,14 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ object.title|title }}</h5>
                             <p class="card-text">{{ object.content }}</p>
+                            <span class="card-text"><strong>Создатель: </strong>{{ object.user_blog }}</span>
                             <p class="card-text"><strong>Дата публикации: </strong>{{ object.published }}</p>
                             <p class="card-text"><strong>Количество просмотров: </strong>{{ object.view_count }}</p>
                         </div>
                     </div>
                 </div>
+                {% if user.is_authenticated %}
+                {% if user == object.user_blog %}
                 <div class="card-footer">
                     <a href="{% url 'catalog:update_blog' object.pk %}" class="btn btn-primary">
                         Изменить
@@ -33,6 +36,10 @@
                         Удалить
                     </a>
                 </div>
+                {% else %}
+                {% endif %}
+                {% else %}
+                {% endif %}
             </div>
         </div>
     </div>

@@ -1,0 +1,32 @@
+{% extends 'layout/basic.html' %}
+
+{% block content %}
+<div class="container-fluid" xmlns="http://www.w3.org/1999/html">
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <div class="card mt-5 mb-5">
+                <div class="card-header">
+                    <h4>Подтверждение регистрации</h4>
+                </div>
+                <div class="card-body">
+                    {% if user.is_active %}
+                    <p>
+                        Уважаемый {{ user.email }}! <br> Спасибо за регистрацию!
+                    </p>
+                    {% else %}
+                    <p>
+                        Здравствуйте, уважаемый пользователь! <br> Спасибо, что вы с нами! Для завершения регистрации на
+                        нашем портале, пожалуйста, подтвердите вашу электронную почту. Письмо с дальнейшими инструкциями
+                        отправлено на ваш почтовый ящик. <br> С уважением, администрация портала!
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'catalog:index' %}" class="btn btn-primary">На главную страницу</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

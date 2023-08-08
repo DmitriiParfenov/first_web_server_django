@@ -42,17 +42,24 @@
                                     {{object.changed|date:"d.m.Y H:i:s"}}
                                 </li>
                             </ul>
+                            <p><b>Пользователь:</b> {{ object.user_product|default:"нет" }}</p>
                         </div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <a href="{% url 'catalog:update_product' object.pk %}" class="btn btn-primary">
-                        Изменить
-                    </a>
-                    <a href="{% url 'catalog:delete_product' object.pk %}" class="btn btn-danger float-right">
-                        Удалить
-                    </a>
-                </div>
+                {% if user.is_authenticated %}
+                {% if user == object.user_product %}
+                    <div class="card-footer">
+                        <a href="{% url 'catalog:update_product' object.pk %}" class="btn btn-primary">
+                            Изменить
+                        </a>
+                        <a href="{% url 'catalog:delete_product' object.pk %}" class="btn btn-danger float-right">
+                            Удалить
+                        </a>
+                    </div>
+                {% else %}
+                {% endif %}
+                {% else %}
+                {% endif %}
             </div>
         </div>
     </div>

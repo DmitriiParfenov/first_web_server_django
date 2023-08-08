@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'catalog.apps.CatalogConfig'
+    'catalog.apps.CatalogConfig',
+    'users.apps.UsersConfig'
 ]
 
 MIDDLEWARE = [
@@ -137,3 +138,7 @@ EMAIL_HOST_PASSWORD = os.getenv('yandex_password_smtp')
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
+
+AUTH_USER_MODEL = 'users.User'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
