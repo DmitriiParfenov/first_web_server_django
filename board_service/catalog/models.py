@@ -77,7 +77,7 @@ class Feedback(models.Model):
         TAJIKISTAN = 'Таджикистан', 'Таджикистан'
         UZBEKISTAN = 'Узбекистан', 'Узбекистан'
 
-    country = models.CharField(choices=Kinds.choices, default=Kinds.RUSSIA, verbose_name='Страна')
+    country = models.CharField(max_length=150, choices=Kinds.choices, default=Kinds.RUSSIA, verbose_name='Страна')
     message = models.TextField(verbose_name='Сообщение')
     publish = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата публикации')
 
@@ -120,7 +120,8 @@ class Version(models.Model):
         NAME_DEVELOP = 'В разработке', 'В разработке'
         NAME_RELEASE = 'Выпуск в производстве', 'Выпуск в производстве'
 
-    title = models.CharField(choices=VersionName.choices, default=VersionName.NAME_DEVELOP, verbose_name='Название')
+    title = models.CharField(max_length=150, choices=VersionName.choices, default=VersionName.NAME_DEVELOP,
+                             verbose_name='Название')
     number = models.DecimalField(max_digits=3, decimal_places=2, verbose_name='Номер версии',
                                  default=increment_version_number, unique=True)
     is_active = models.BooleanField(default=False, verbose_name='Активность')
