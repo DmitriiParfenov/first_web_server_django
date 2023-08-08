@@ -10,9 +10,12 @@
                     <h4>Блок: повышаем эффективность продаж</h4>
                 </div>
             </div>
+            {% if user.is_authenticated %}
             <div class="col-md-2">
                 <a class="btn btn-primary" href="{% url 'catalog:add_blog' %}">Добавить публикацию</a>
             </div>
+            {% else %}
+            {% endif %}
         </div>
     </div>
 </div>
@@ -36,6 +39,7 @@
                         Подробнее</a>
                     </p>
                     {% endif %}
+                    {{ object.user_blog|default:"нет" }}
                 </div>
                 <div class="card-footer">
                     <p class="text-body-secondary">Опубликовано {{object.published|date:"d.m.Y H:i:s"}}</p>
