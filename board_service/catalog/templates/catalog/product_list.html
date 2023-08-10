@@ -87,19 +87,17 @@
                                         aria-expanded="false">
                                     <span>{{cat.category}}</span>
                                 </button>
-                                {% if user.is_authenticated %}
-                                {% if user == cat.user_category %}
+                                {% if user.is_staff %}
                                 <a href="{% url 'catalog:update_category' cat.pk %}"
                                    class="btn btn-outline-primary">
                                     Изменить
                                 </a>
+                                {% if perms.catalog.delete_category %}
                                 <a href="{% url 'catalog:delete_category' cat.pk %}"
                                    class="btn btn-outline-danger float-right">
                                     Удалить
                                 </a>
-                                {% else %}
                                 {% endif %}
-                                {% else %}
                                 {% endif %}
                                 <ul class="dropdown-menu">
                                     {% if cat.categories.all %}
@@ -117,11 +115,10 @@
                     </ul>
                     {% endfor %}
                 </div>
-                {% if user.is_authenticated %}
+                {% if perms.catalog.add_category %}
                 <div class="card-footer">
                     <a href="{% url 'catalog:add_category' %}" class="btn btn-primary">Добавить категорию</a>
                 </div>
-                {% else %}
                 {% endif %}
             </div>
         </div>

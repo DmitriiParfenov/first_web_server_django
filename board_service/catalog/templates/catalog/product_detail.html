@@ -43,22 +43,38 @@
                                 </li>
                             </ul>
                             <p><b>Пользователь:</b> {{ object.user_product|default:"нет" }}</p>
+                            <p>
+                                {% if perms.catalog.set_published %}
+                                <a href="{% url 'catalog:publish_product' object.pk %}" class="btn btn-primary">
+                                    Опубликовать
+                                </a>
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                 </div>
-                {% if user.is_authenticated %}
                 {% if user == object.user_product %}
-                    <div class="card-footer">
-                        <a href="{% url 'catalog:update_product' object.pk %}" class="btn btn-primary">
-                            Изменить
-                        </a>
-                        <a href="{% url 'catalog:delete_product' object.pk %}" class="btn btn-danger float-right">
-                            Удалить
-                        </a>
-                    </div>
-                {% else %}
-                {% endif %}
-                {% else %}
+                <div class="card-footer">
+                    <a href="{% url 'catalog:update_product' object.pk %}" class="btn btn-primary">
+                        Изменить
+                    </a>
+                    <a href="{% url 'catalog:delete_product' object.pk %}" class="btn btn-danger float-right">
+                        Удалить
+                    </a>
+                </div>
+                {% elif user.is_staff %}
+                <div class="card-footer">
+                    {% if perms.catalog.change_product %}
+                    <a href="{% url 'catalog:update_product' object.pk %}" class="btn btn-primary">
+                        Изменить
+                    </a>
+                    {% endif %}
+                    {% if perms.catalog.delete_product %}
+                    <a href="{% url 'catalog:delete_product' object.pk %}" class="btn btn-danger float-right">
+                        Удалить
+                    </a>
+                    {% endif %}
+                </div>
                 {% endif %}
             </div>
         </div>
