@@ -23,12 +23,18 @@
                 <li class="list-inline-item">
                     Цена: {{item.price}} рублей
                 </li>
+                {% if user.is_authenticated %}
+                {% if user == item.user_product %}
                 <li class="list-inline-item">
                     <button type="button" class="btn btn-outline-dark"
                             style="font-size: 10px;">
                         В корзину
                     </button>
                 </li>
+                {% else %}
+                {% endif %}
+                {% else %}
+                {% endif %}
             </ul>
         </li>
     </ul>
