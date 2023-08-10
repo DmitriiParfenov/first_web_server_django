@@ -15,7 +15,7 @@ class StyleFormMixin:
 class ProductForm(StyleFormMixin, models.ModelForm):
     class Meta:
         model = Product
-        fields = ('name', 'description', 'image', 'price', 'category',)
+        fields = ('name', 'description', 'image', 'price', 'category')
 
     def clean_name(self):
         cleaned_data = self.cleaned_data['name']
@@ -24,6 +24,14 @@ class ProductForm(StyleFormMixin, models.ModelForm):
             raise models.ValidationError('Нельзя публиковать запрещенные товары')
 
         return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if field_name == 'is_published':
+                field.widget.attrs['class'] = 'form'
+            else:
+                field.widget.attrs['class'] = 'form-control'
 
 
 class CategoryForm(StyleFormMixin, models.ModelForm):
@@ -39,7 +47,6 @@ class BlogForm(StyleFormMixin, models.ModelForm):
 
 
 class VersionForm(models.ModelForm):
-
     class Meta:
         model = Version
         fields = ('title', 'number', 'is_active',)
@@ -66,3 +73,8 @@ class VersionBaseInlineFormSet(BaseInlineFormSet):
         if active_list.count(True) > 1:
             raise ValidationError('Возможна лишь одна активная версия. Пожалуйста, активируйте только 1 версию.')
 
+
+class PublishProductForm(models.ModelForm):
+    class Meta:
+        model = Product
+        fields = ('is_published',)
