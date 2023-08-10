@@ -26,7 +26,6 @@
                         </div>
                     </div>
                 </div>
-                {% if user.is_authenticated %}
                 {% if user == object.user_blog %}
                 <div class="card-footer">
                     <a href="{% url 'catalog:update_blog' object.pk %}" class="btn btn-primary">
@@ -36,9 +35,19 @@
                         Удалить
                     </a>
                 </div>
-                {% else %}
-                {% endif %}
-                {% else %}
+                {% elif user.is_staff %}
+                <div class="card-footer">
+                    {% if perms.catalog.change_blog %}
+                    <a href="{% url 'catalog:update_blog' object.pk %}" class="btn btn-primary">
+                        Изменить
+                    </a>
+                    {% endif %}
+                    {% if perms.catalog.delete_blog %}
+                    <a href="{% url 'catalog:delete_blog' object.pk %}" class="btn btn-danger float-right">
+                        Удалить
+                    </a>
+                    {% endif %}
+                </div>
                 {% endif %}
             </div>
         </div>
