@@ -1,0 +1,58 @@
+{% extends "layout/basic.html" %}
+{% load products_tags %}
+
+{% block content %}
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title text-center">Неопубликованные продукты</h5>
+                </div>
+                <div class="card-body">
+                    {% for obj in page_obj %}
+                    <ul>
+                        <li>
+                            <ul class="list-inline">
+                                <li class="list-inline-item"
+                                    style="font-family: cursive; font-weight: 600; font-size: 100%">
+                                    <a href="{% url 'catalog:product_detail' obj.pk %}">{{obj.name}}</a>
+                                </li>
+                                <li class="list-inline-item">{{obj.published|date:"d.m.Y H:i:s"}}</li>
+                                <li class="list-inline-item">
+                                    <a href="{% url 'catalog:product_detail' obj.pk %}" class="btn btn-primary">Редактировать</a>
+                                </li>
+                            </ul>
+                            {{obj.description}}
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    Цена: {{obj.price}} рублей
+                                </li>
+                            </ul>
+                            <strong>Пользователь: </strong>{{ obj.user_product|default:"нет" }}
+                            <ul class="list-inline">
+                                {% for version in versions %}
+                                {% if version.product.pk == obj.pk %}
+                                <li class="list-inline-item">
+                                    <strong>Название: </strong>{{ version.title|lower }},
+                                </li>
+                                <li class="list-inline-item">
+                                    <strong>номер: </strong>{{ version.number }},
+                                </li>
+                                <li class="list-inline-item">
+                                    <strong>статус: </strong> активно.
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                    {% include 'catalog/includes/inc_paginate.html' %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
