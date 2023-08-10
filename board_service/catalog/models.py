@@ -24,6 +24,7 @@ class Product(models.Model):
                                  verbose_name='Категория', )
     user_product = models.ForeignKey('users.User', on_delete=models.SET_NULL, verbose_name='пользователь',
                                      **NULLABLE)
+    is_published = models.BooleanField(default=False, verbose_name='Опубликовано')
 
     def __str__(self):
         return f'{self.name} ({self.category})'
@@ -32,6 +33,12 @@ class Product(models.Model):
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
         ordering = ('-published',)
+        permissions = [
+            (
+                'set_published',
+                'Can publish Продукт'
+            )
+        ]
 
 
 class Category(models.Model):
