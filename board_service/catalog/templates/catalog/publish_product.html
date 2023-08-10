@@ -1,0 +1,27 @@
+{% extends 'layout/basic.html' %}
+
+{% block content %}
+<div class="container-fluid" xmlns="http://www.w3.org/1999/html">
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <form method="post">
+                {% csrf_token %}
+                <div class="card mt-5 mb-5">
+                    <div class="card-header">
+                        <h4>Публикация</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Данная публикация удовлетворяет требования сайта?</p>
+                        {{ form.as_p }}
+                    </div>
+                    <div class="card-footer">
+                        <input type="submit" value="Выполнить" class="btn btn-primary">
+                        <a href="{% url 'catalog:index' %}" class="btn btn-danger">Отмена</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -38,6 +38,13 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{% url 'catalog:blog_list' %}">Блог</a>
                     </li>
+                    {% if perms.catalog.set_published %}
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'catalog:moderate_products' %}">
+                            Продукты для модерации
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
             <span class="navbar-text">
