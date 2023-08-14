@@ -15,6 +15,7 @@ from pytils.translit import slugify
 
 from catalog.forms import ProductForm, CategoryForm, BlogForm, VersionForm, VersionBaseInlineFormSet, PublishProductForm
 from catalog.models import Category, Product, Feedback, Blog, Version
+from catalog.services import get_cached_categories
 
 
 class IndexTemplateView(TemplateView):
@@ -100,7 +101,7 @@ class ProductListView(ListView):
         context = super().get_context_data(*args, **kwargs)
 
         # Обновление контекста
-        context['categories'] = Category.objects.all()
+        context['categories'] = get_cached_categories()
         context['title'] = 'Catalogue: все продукты'
         context['versions'] = Version.objects.filter(is_active=True)
 
@@ -178,7 +179,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
 
         # Обновление контекста
-        context['category'] = Category.objects.all()
+        context['categories'] = get_cached_categories()
         context['title'] = 'Добавление товара'
 
         return context
@@ -225,7 +226,7 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
 
         # Обновление контекста
-        context['category'] = Category.objects.all()
+        context['categories'] = get_cached_categories()
         context['title'] = 'Добавление товара'
         context['product_user'] = self.object.user_product
 
